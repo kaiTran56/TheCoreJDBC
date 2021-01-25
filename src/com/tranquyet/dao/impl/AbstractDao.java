@@ -30,6 +30,7 @@ public class AbstractDao<T> implements GenericDao<T> {
 
 	}
 
+	@SuppressWarnings("hiding")
 	@Override
 	public <T> List<T> query(String sql, RowMapper<T> rowMapper, Object... parameters) {
 		List<T> resultsList = new ArrayList<T>();
@@ -47,7 +48,7 @@ public class AbstractDao<T> implements GenericDao<T> {
 			while (resultSet.next()) {
 				resultsList.add(rowMapper.mapRow(resultSet));
 			}
-
+			return resultsList;
 		} catch (SQLException e) {
 			return null;
 		} finally {
