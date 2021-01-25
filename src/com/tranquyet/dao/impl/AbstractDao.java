@@ -2,7 +2,10 @@ package com.tranquyet.dao.impl;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.tranquyet.dao.GenericDao;
@@ -29,7 +32,41 @@ public class AbstractDao<T> implements GenericDao<T> {
 
 	@Override
 	public <T> List<T> query(String sql, RowMapper<T> rowMapper, Object... parameters) {
-		// TODO Auto-generated method stub
-		return null;
+		List<T> resultsList = new ArrayList<T>();
+
+		Connection connection = null;
+		PreparedStatement statement = null;
+		ResultSet resultSet = null;
+
+		try {
+			connection = getConnectToJDBC();
+			statement = connection.prepareStatement(sql);
+			// set parameters
+			resultSet = statement.executeQuery();
+
+			while (resultSet.next()) {
+				resultsList.add(rowMapper.mapRow(resultSet));
+			}
+
+		} catch (SQLException e) {
+			return null;
+		} finally {
+
+			try {
+				if (connection != null) {
+					connection.close();
+				}
+				if (statement != null) {
+					statement.close();
+				}
+				if (resultSet != null) {
+					resultSet.close();
+				}
+			} catch (SQLException e) {
+				return null;
+			}
+
+		}
+
 	}
 }
